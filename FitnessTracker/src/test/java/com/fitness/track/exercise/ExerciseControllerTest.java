@@ -44,6 +44,28 @@ class ExerciseControllerTest {
                 .andExpect(jsonPath("$.length()").value(0));
     }
 
+    @Test
+    void returnsBestEstimatedOneRepMaxAcrossSets() throws Exception {
+        createWorkout("2024-03-01", """
+                { "exercise": "Squat", "weightKg": 100.0, "repetitions": 1 }
+                """);
+        createWorkout("2024-03-10", """
+                { "exercise": "Squat", "weightKg": 90.0, "repetitions": 5 }
+                """);
+
+        mockMvc.perform(get("/api/exercises/{name}/best", "Squat"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estimatedOneRepMaxKg").value(105.0))
+                .andExpect(jsonPath("$.weightKg").value(90.0))
+                .andExpect(jsonPath("$.repetitions").value(5));
+    }
+
+    @Test
+    void returnsNotFoundForBestWhenNoDataExists() throws Exception {
+        mockMvc.perform(get("/api/exercises/{name}/best", "Nonexistent Exercise"))
+                .andExpect(status().isNotFound());
+    }
+
     private void createWorkout(String date, String setJson) throws Exception {
         String requestBody = """
                 {

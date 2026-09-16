@@ -1,5 +1,6 @@
 package com.fitness.track.exercise;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,5 +21,12 @@ public class ExerciseController {
     @GetMapping("/{name}/history")
     public List<ExerciseSetHistoryEntry> getHistory(@PathVariable String name) {
         return exerciseService.getHistory(name);
+    }
+
+    @GetMapping("/{name}/best")
+    public ResponseEntity<EstimatedOneRepMax> getBest(@PathVariable String name) {
+        return exerciseService.getBestOneRepMax(name)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

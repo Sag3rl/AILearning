@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -51,5 +52,33 @@ class ExerciseServiceTest {
     @Test
     void returnsEmptyListWhenNoWorkoutsExist() {
         assertTrue(exerciseService.getHistory("Bench Press").isEmpty());
+    }
+
+    @Test
+    void bestOneRepMaxPicksHighestEstimateNotHighestWeight() {
+        workoutRepository.save(LocalDate.of(2024, 1, 10), List.of(new WorkoutSet("Bench Press", 100.0, 1)));
+        workoutRepository.save(LocalDate.of(2024, 1, 20), List.of(new WorkoutSet("Bench Press", 90.0, 5)));
+
+        Optional<EstimatedOneRepMax> best = exerciseService.getBestOneRepMax("Bench Press");
+
+        assertTrue(best.isPresent());
+        assertEquals(90.0, best.get().weightKg());
+        assertEquals(5, best.get().repetitions());
+        assertEquals(105.0, best.get().estimatedOneRepMaxKg(), 0.0001);
+    }
+
+    @Test
+    void bestOneRepMaxEqualsWeightForSingleRepetition() {
+        workoutRepository.save(LocalDate.of(2024, 1, 10), List.of(new WorkoutSet("Deadlift", 150.0, 1)));
+
+        Optional<EstimatedOneRepMax> best = exerciseService.getBestOneRepMax("Deadlift");
+
+        assertTrue(best.isPresent());
+        assertEquals(150.0, best.get().estimatedOneRepMaxKg());
+    }
+
+    @Test
+    void bestOneRepMaxIsEmptyWhenNoDataExists() {
+        assertTrue(exerciseService.getBestOneRepMax("Deadlift").isEmpty());
     }
 }
