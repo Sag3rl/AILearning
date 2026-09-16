@@ -2,6 +2,7 @@ package com.fitness.track.workout;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,8 +14,8 @@ class WorkoutRepositoryTest {
 
     @Test
     void savedWorkoutIsAssignedAUniqueIdAndCanBeFound() {
-        Workout first = repository.save(List.of(new WorkoutSet("Bench Press", 80.0, 5)));
-        Workout second = repository.save(List.of(new WorkoutSet("Squat", 100.0, 3)));
+        Workout first = repository.save(LocalDate.of(2024, 1, 15), List.of(new WorkoutSet("Bench Press", 80.0, 5)));
+        Workout second = repository.save(LocalDate.of(2024, 1, 16), List.of(new WorkoutSet("Squat", 100.0, 3)));
 
         assertNotNull(first.id());
         assertNotEquals(first.id(), second.id());

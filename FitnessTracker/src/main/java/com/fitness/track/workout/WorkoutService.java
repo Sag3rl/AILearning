@@ -18,7 +18,7 @@ public class WorkoutService {
         List<WorkoutSet> sets = request.sets().stream()
                 .map(set -> new WorkoutSet(set.exercise(), set.weightKg(), set.repetitions()))
                 .toList();
-        return workoutRepository.save(sets);
+        return workoutRepository.save(request.date(), sets);
     }
 
     public Optional<Workout> getWorkout(Long id) {
